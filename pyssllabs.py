@@ -72,42 +72,6 @@ class EndPoint(object):
     delegation = None
     details = None
 
-class EndpointDetails(object):
-    hostStartTime = None
-    key = {}
-    cert = {}
-    chain = {}
-    protocols = []
-    suites = {}
-    serverSignature = None
-    prefixDelegation = None
-    nonPrefixDelegation = None
-    vulnBeast = None
-    renegSupport = None
-    stsResponseHeader = None
-    stsMaxAge = None
-    stsSubdomains = None
-    pkpResponseHeader = None
-    sessionResumption = None
-    compressionMethods = None
-    supportsNpn = None
-    npnProtocols = None
-    sessionTickets = None
-    ocspStapling = None
-    sniRequired = None
-    httpStatusCode = None
-    httpForwarding = None
-    supportsRc4 = None
-    forwardSecrecy = None
-    rc4WithModern = None
-    sims = None
-    heartbleed = None
-    heartbeat = None
-    openSslCcs = None
-    poodleTls = None
-    fallbackScsv = None
-    freak = None
-
 class Key(object):
     size = None
     strength = None
@@ -134,6 +98,49 @@ class Cert(object):
 class Chain(object):
     certs = []
     issues = None
+
+class Suites(object):
+    _list = []
+    preference = None
+
+class SimDetails(object):
+    results = []
+
+class EndpointDetails(object):
+    hostStartTime = None
+    key = Key()
+    cert = Cert()
+    chain = Chain()
+    protocols = []
+    suites = Suites()
+    serverSignature = None
+    prefixDelegation = None
+    nonPrefixDelegation = None
+    vulnBeast = None
+    renegSupport = None
+    stsResponseHeader = None
+    stsMaxAge = None
+    stsSubdomains = None
+    pkpResponseHeader = None
+    sessionResumption = None
+    compressionMethods = None
+    supportsNpn = None
+    npnProtocols = None
+    sessionTickets = None
+    ocspStapling = None
+    sniRequired = None
+    httpStatusCode = None
+    httpForwarding = None
+    supportsRc4 = None
+    forwardSecrecy = None
+    rc4WithModern = None
+    sims = SimDetails()
+    heartbleed = None
+    heartbeat = None
+    openSslCcs = None
+    poodleTls = None
+    fallbackScsv = None
+    freak = None
 
 class ChainCert(object):
     subject = None
@@ -163,19 +170,12 @@ class SimClient(object):
     version = None
     isReference = None
 
-class SimDetails(object):
-    results = []
-
 class Simulation(object):
     client = None
     errorCode = None
     attempts = None
     protocolId = None
     suiteId = None
-
-class Suites(object):
-    _list = []
-    preference = None
 
 class Suite(object):
     _id = None
