@@ -23,11 +23,22 @@ def _parse_args():
     meg.add_argument('-i', '--info', action='store_true', help='Info')
     meg.add_argument('-H', '--host', dest='host', type=str, metavar='<host>',
                      help='Test a single host e.g. www.example.com')
+
+
     meg.add_argument('-S', '--statuscodes', action='store_true',
+                     help='Show available status codes and its details')
+
+    meg.add_argument('-file', '--file', action='store_true',
                      help='Show available status codes and its details')
 
     ap.add_argument('-n', '--nocolor', action='store_true',
                     help='Omit colorized output')
+
+    ap.add_argument('-g', '--grade', action='store_true',
+                    help='Output the grade in the form <fqdn>:<grade>')
+
+    ap.add_argument('-s', '--startnew', action='store_true',
+                     help='Start new scan. Don\'t deliver cached results.')
 
     return ap
 
@@ -438,19 +449,20 @@ if __name__ == '__main__':
     elif args.host:
 
         s = SSLLabs()
-        h = s.analyze(args.host)
+
+        h = s.analyze(args.host, startNew = 'on' if args.startnew else 'off')
 
         if args.nocolor:
             hasColorama = False
 
         if h.status == 'READY':
 
-
             for endpoint in h.endpoints:
-                msg = endpoint.serverName + ' (' + endpoint.ipAddress + ')' + ':'
+                if not args.grade:
+                    msg = endpoint.serverName + ' (' + endpoint.ipAddress + ')' + ':'
 
-                print(_c(Style.BRIGHT) + _c(Fore.WHITE) + msg)
-                print(len(msg) * '-')
+                    print(_c(Style.BRIGHT) + _c(Fore.WHITE) + msg)
+                    print(len(msg) * '-')
 
                 c = None
 
@@ -460,6 +472,10 @@ if __name__ == '__main__':
                     c = Fore.YELLOW
                 elif endpoint.grade in [ 'F', 'T', 'M' ]:
                     c = Fore.RED
+
+                if args.grade:
+                    print(_c(Fore.WHITE) + endpoint.serverName + ': ' +  _c(c) + endpoint.grade)
+                    break
 
                 if endpoint.grade == 'T':
                     print(_c(Fore.BLUE) + 'Rating: ' + '\t\t' + _c(c) +
@@ -512,14 +528,15 @@ if __name__ == '__main__':
                           _c(Fore.GREEN) + 'not vulnerable')
             print('')
 
-            print(_c(Fore.BLUE) + 'Test starting time: ' + '\t' +
-                  _c(Fore.CYAN) + _format_timestamp(h.startTime))
-            print(_c(Fore.BLUE) + 'Test completion time: ' + '\t' +
-                  _c(Fore.CYAN) + _format_timestamp(h.testTime))
-            print(_c(Fore.BLUE) + 'Test duration: ' + '\t\t' +
-                  _c(Fore.CYAN) + 
-                  str(datetime.strptime(_format_timestamp(h.testTime), _FMT) - 
-                  datetime.strptime(_format_timestamp(h.startTime), _FMT)))
+            if not args.grade:
+                print(_c(Fore.BLUE) + 'Test starting time: ' + '\t' +
+                      _c(Fore.CYAN) + _format_timestamp(h.startTime))
+                print(_c(Fore.BLUE) + 'Test completion time: ' + '\t' +
+                      _c(Fore.CYAN) + _format_timestamp(h.testTime))
+                print(_c(Fore.BLUE) + 'Test duration: ' + '\t\t' +
+                      _c(Fore.CYAN) + 
+                      str(datetime.strptime(_format_timestamp(h.testTime), _FMT) - 
+                      datetime.strptime(_format_timestamp(h.startTime), _FMT)))
 
             if h.cacheExpiryTime:
                 print(_c(Fore.BLUE) + 'Cache expiry time: ' + '\t' +
